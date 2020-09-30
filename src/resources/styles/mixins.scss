@@ -1,0 +1,7 @@
+@import './variables.scss';
+
+@mixin media-mobile {
+	@media screen and (max-width: #{$mobile-width}) {
+		@content;
+	}
+}
