@@ -38,7 +38,6 @@ export const App: FC = () => {
 		<div className={styles.container}>
 			<div className={styles.options}>
 				<OptionsSection title='Playing mode:' options={options.playingMode} />
-				<OptionsSection title='Number of cells:' options={options.cellsCount} />
 			</div>
 
 			<h2 className={styles.title}>Tic-Tac-Toe</h2>

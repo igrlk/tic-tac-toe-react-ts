@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { CellValue, Cells } from '../frames/Cell';
 
 export interface IState {
-	cellsCount: number;
 	isPvP: boolean;
 	isXTurn: boolean;
 	cells: CellValue[];
@@ -17,10 +16,9 @@ export type PatchState = (fields: Partial<IState>) => void;
 
 export const useGameState = () => {
 	const [state, setState] = useState<IState>({
-		cellsCount: 3,
-		isPvP: false,
+		isPvP: true,
 		isXTurn: true,
-		cells: getCells(3),
+		cells: getCells(),
 		winningCounts: {
 			[CellValue.x]: 0,
 			[CellValue.o]: 0,
@@ -39,7 +37,7 @@ export const useGameState = () => {
 
 	useEffect(() => {
 		patchState({
-			cells: getCells(state.cellsCount),
+			cells: getCells(),
 			winningCounts: {
 				[CellValue.x]: 0,
 				[CellValue.o]: 0,
@@ -47,15 +45,15 @@ export const useGameState = () => {
 			isXTurn: true,
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [state.isPvP, state.cellsCount]);
+	}, [state.isPvP]);
 
 	const playAgain = useCallback(() => {
 		patchState({
 			isXTurn: true,
-			cells: getCells(state.cellsCount),
+			cells: getCells(),
 			noFreeCells: false,
 		});
-	}, [state.cellsCount, patchState]);
+	}, [patchState]);
 
 	return {
 		state,
@@ -64,4 +62,4 @@ export const useGameState = () => {
 	};
 };
 
-const getCells = (cellsCount: number): Cells => new Array(cellsCount ** 2).fill(CellValue.empty);
+const getCells = (): Cells => new Array(9).fill(CellValue.empty);
