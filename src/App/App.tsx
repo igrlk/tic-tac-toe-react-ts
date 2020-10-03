@@ -12,6 +12,7 @@ import styles from './App.module.scss';
 import { useGameState } from './hooks/useGameState';
 import { useGameOptions } from './hooks/useGameOptions';
 import { Button } from './frames/Button';
+import { useCellsToRender } from './hooks/useCellsToRender';
 
 export const App: FC = () => {
 	const { state, patchState, playAgain } = useGameState();
@@ -31,6 +32,8 @@ export const App: FC = () => {
 	const handleCellClick = useHandleCellClick({ state, patchState, winner });
 	const options = useGameOptions({ state, patchState });
 
+	const cellsToRender = useCellsToRender(state.cells);
+
 	return (
 		<div className={styles.container}>
 			<div className={styles.options}>
@@ -41,10 +44,14 @@ export const App: FC = () => {
 			<h2 className={styles.title}>Tic-Tac-Toe</h2>
 
 			<div className={styles.cellsContainer}>
-				{state.cells.map((row, rowIndex) => (
+				{cellsToRender.map((row, rowIndex) => (
 					<div key={rowIndex} className={styles.row}>
 						{row.map((cell, cellIndex) => (
-							<Cell key={cellIndex} value={cell} onClick={() => handleCellClick(rowIndex, cellIndex)} />
+							<Cell
+								key={cellIndex}
+								value={cell}
+								onClick={() => handleCellClick(rowIndex * cellsToRender.length + cellIndex)}
+							/>
 						))}
 					</div>
 				))}

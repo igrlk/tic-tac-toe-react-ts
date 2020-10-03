@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 
-import { CellValue } from '../frames/Cell';
+import { CellValue, Cells } from '../frames/Cell';
 
 export interface IState {
 	cellsCount: number;
 	isPvP: boolean;
 	isXTurn: boolean;
-	cells: CellValue[][];
+	cells: CellValue[];
 	winningCounts: {
 		[CellValue.x]: number;
 		[CellValue.o]: number;
@@ -18,7 +18,7 @@ export type PatchState = (fields: Partial<IState>) => void;
 export const useGameState = () => {
 	const [state, setState] = useState<IState>({
 		cellsCount: 3,
-		isPvP: true,
+		isPvP: false,
 		isXTurn: true,
 		cells: getCells(3),
 		winningCounts: {
@@ -64,5 +64,4 @@ export const useGameState = () => {
 	};
 };
 
-const getCells = (cellsCount: number): CellValue[][] =>
-	new Array(cellsCount).fill(new Array(cellsCount).fill(undefined));
+const getCells = (cellsCount: number): Cells => new Array(cellsCount ** 2).fill(CellValue.empty);

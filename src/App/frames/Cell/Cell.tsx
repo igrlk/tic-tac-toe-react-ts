@@ -9,6 +9,8 @@ export enum CellValue {
 	empty = '',
 }
 
+export type Cells = CellValue[];
+
 interface ICell {
 	value: CellValue;
 	onClick: () => void;

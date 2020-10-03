@@ -3,6 +3,8 @@ import { produce } from 'immer';
 
 import { CellValue } from '../frames/Cell';
 import { PatchState, IState } from './useGameState';
+import { getWinner } from './useWinnerDetection';
+import { getBestTurn } from '../utils/getBestTurn';
 
 export const useHandleCellClick = ({
 	state: { cells, isPvP, isXTurn },
@@ -14,21 +16,26 @@ export const useHandleCellClick = ({
 	winner: CellValue | null;
 }) =>
 	useCallback(
-		(rowIndex: number, cellIndex: number) => {
-			if (cells[rowIndex][cellIndex] || winner) return;
+		(index: number) => {
+			if (cells[index] || winner) return;
 
-			const freeCells = getFreeCells(cells, rowIndex, cellIndex);
+			const newCells = produce(cells, draft => {
+				if (isPvP) {
+					draft[index] = isXTurn ? CellValue.x : CellValue.o;
+				} else {
+					draft[index] = CellValue.x;
+				}
+			});
+
+			const freeCells = newCells.filter(cell => cell === CellValue.empty);
 
 			patchState({
-				cells: produce(cells, draft => {
-					if (isPvP) {
-						draft[rowIndex][cellIndex] = isXTurn ? CellValue.x : CellValue.o;
-					} else {
-						draft[rowIndex][cellIndex] = CellValue.x;
+				cells: produce(newCells, draft => {
+					if (!isPvP && !getWinner(newCells)) {
+						const bestTurn = getBestTurn(newCells);
 
-						const randomCell = freeCells[Math.floor(Math.random() * freeCells.length)];
-						if (randomCell) {
-							draft[randomCell[0]][randomCell[1]] = CellValue.o;
+						if (draft[bestTurn] === CellValue.empty) {
+							draft[bestTurn] = CellValue.o;
 						}
 					}
 				}),
@@ -38,19 +45,3 @@ export const useHandleCellClick = ({
 		},
 		[cells, isXTurn, winner, isPvP, patchState],
 	);
-
-const getFreeCells = (cells: CellValue[][], rowIndex: number, cellIndex: number) => {
-	const freeCells: number[][] = [];
-
-	for (const draftRowIndex in cells) {
-		for (const draftCellIndex in cells[draftRowIndex]) {
-			if (!cells[draftRowIndex][draftCellIndex]) {
-				if (+draftRowIndex !== rowIndex || +draftCellIndex !== cellIndex) {
-					freeCells.push([+draftRowIndex, +draftCellIndex]);
-				}
-			}
-		}
-	}
-
-	return freeCells;
-};

@@ -1,30 +1,30 @@
 import { useMemo } from 'react';
 
-import { CellValue } from '../frames/Cell';
+import { Cells } from '../frames/Cell';
 
-export const useWinnerDetection = (cells: CellValue[][]) =>
-	useMemo(() => {
-		const plainCells = cells.reduce((a, b) => a.concat(b));
-		const cellsLengthInRow = Math.sqrt(plainCells.length);
+export const getWinner = (cells: Cells) => {
+	const cellsLengthInRow = Math.sqrt(cells.length);
 
-		const lines = getVerticalLines(cellsLengthInRow)
-			.concat(getHorizontalLines(cellsLengthInRow))
-			.concat(getDiagonalLines(cellsLengthInRow));
+	const lines = getVerticalLines(cellsLengthInRow)
+		.concat(getHorizontalLines(cellsLengthInRow))
+		.concat(getDiagonalLines(cellsLengthInRow));
 
-		for (const line of lines) {
-			const value = plainCells[line[0]];
+	for (const line of lines) {
+		const value = cells[line[0]];
 
-			for (const i in line) {
-				const cellIndex = line[i];
+		for (const i in line) {
+			const cellIndex = line[i];
 
-				if (!value || plainCells[cellIndex] !== value) break;
+			if (!value || cells[cellIndex] !== value) break;
 
-				if (+i === line.length - 1) return value;
-			}
+			if (+i === line.length - 1) return value;
 		}
+	}
 
-		return null;
-	}, [cells]);
+	return null;
+};
+
+export const useWinnerDetection = (cells: Cells) => useMemo(() => getWinner(cells), [cells]);
 
 const getVerticalLines = (length: number) =>
 	getArr(length).map((_, rowIndex) => getArr(length).map((__, colIndex) => colIndex * length + rowIndex));
